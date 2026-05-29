@@ -16,6 +16,9 @@ import math
 from datetime import datetime, timedelta
 from typing import List, Optional
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="DataPulse Pipeline Monitor API", version="1.0.0")
 
@@ -29,13 +32,27 @@ app.add_middleware(
 )
 
 # ── Config ──────────────────────────────────────────────────────
-ANTHROPIC_API_KEY = os.getenv("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", "")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 ANTHROPIC_URL     = "https://api.anthropic.com/v1/messages"
 CLAUDE_MODEL      = "claude-sonnet-4-20250514"
+DATA_SOURCE       = os.getenv("DATA_SOURCE", "mock").lower()
+GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "")
+BQ_DATASET        = os.getenv("BQ_DATASET", "")
+BQ_TABLE          = os.getenv("BQ_TABLE", "")
+DBT_LOG_PATH      = Path(__file__).parent / "dbt.log"
 
 # ── Layer definitions ───────────────────────────────────────────
 LAYERS = ["BQ Load", "Raw Layer", "Hist Layer", "ODS Layer"]
 LKEYS  = ["bq_load", "raw", "hist", "ods"]
+TABLE_NAMES = [
+    "dim_customers",
+    "fact_orders",
+    "stg_payments",
+    "ods_transactions",
+    "stg_products",
+    "orders_archive",
+]
+FILE_STATUSES = ["Landed", "Preprocessed", "BQ Loaded", "Raw", "Hist", "ODS Ready"]
 
 # ═══════════════════════════════════════════════════════════════
 #  DATA GENERATION (simulated pipeline runs)
@@ -89,6 +106,133 @@ def generate_pipeline_runs(days: int = 14) -> List[dict]:
 
     runs.reverse()
     return runs[:56]
+
+
+# Sample audit table schema:
+# - source_file_name: name of the incoming file
+# - table_name: destination table or logical table name
+# - run_date: scheduled run date for this batch
+# - job_start_date: actual processing start timestamp
+# - row_count: processed row count for the table
+# - status: derived pipeline state
+# - anomalies: detected data quality issues
+# - layer_counts: optional counts for monitoring each layer
+
+def calculate_layer_metrics(record: dict) -> dict:
+    """Calculate data quality metrics per layer and record loss."""
+    lc = record["layer_counts"]
+    layers = ["source", "gcs_raw", "gcs_prep", "bq_load", "raw", "hist"]
+    metrics = []
+    
+    for i in range(len(layers)):
+        curr_count = lc[layers[i]]
+        loss_pct = 0
+        
+        if i > 0:
+            prev_count = lc[layers[i - 1]]
+            loss_pct = round(((prev_count - curr_count) / prev_count * 100), 2) if prev_count > 0 else 0
+        
+        status = "OK"
+        if loss_pct > 4:
+            status = "FAIL"
+        elif loss_pct > 1.5:
+            status = "WARN"
+        
+        metrics.append({
+            "layer": layers[i],
+            "count": curr_count,
+            "loss_pct": loss_pct,
+            "status": status
+        })
+    
+    return {"layers": metrics, "anomalies": record.get("anomalies", [])}
+
+def generate_audit_records(count: int = 100) -> List[dict]:
+    rng = random.Random(1234)
+    records = []
+    base_rows = 90000
+    last_ods_by_table = {}
+
+    for i in range(count):
+        run_dt = datetime.now() - timedelta(hours=i * 1)
+        run_date = run_dt.strftime("%Y-%m-%d")
+        arrival_dt = run_dt - timedelta(minutes=int(rng.random() * 15 + 3))
+        preproc_dt = arrival_dt + timedelta(minutes=int(rng.random() * 7 + 4))
+        bq_load_dt = preproc_dt + timedelta(minutes=int(rng.random() * 6 + 3))
+        raw_dt = bq_load_dt + timedelta(minutes=int(rng.random() * 4 + 2))
+        hist_dt = raw_dt + timedelta(minutes=int(rng.random() * 3 + 1))
+        job_start_dt = run_dt - timedelta(minutes=int(rng.random() * 15))
+        job_start_date = job_start_dt.strftime("%Y-%m-%d %H:%M:%S")
+        table_name = TABLE_NAMES[i % len(TABLE_NAMES)]
+        file_name = f"{table_name}_{run_dt.strftime('%Y%m%d_%H%M%S')}.csv"
+        row_count = base_rows + int((rng.random() - 0.5) * 14000)
+        null_pct = round(rng.random() * 3.5 + (5 if rng.random() < 0.06 else 0), 2)
+        gcs_raw = int(row_count * (0.98 + rng.random() * 0.012))
+        gcs_prep = int(gcs_raw * (0.98 + rng.random() * 0.012))
+        bq_load = int(gcs_prep * (0.995 + rng.random() * 0.005))
+        raw = int(bq_load * (0.96 + rng.random() * 0.022))
+        hist = int(raw * (0.992 + rng.random() * 0.006))
+        ods = int(hist * (0.995 + rng.random() * 0.004))
+        status_index = rng.randint(3, 6)
+        status = FILE_STATUSES[status_index - 1]
+        anomalies = []
+        if row_count > base_rows * 1.8:
+            anomalies.append("SPIKE")
+        if row_count < base_rows * 0.55:
+            anomalies.append("DROP")
+        if rng.random() < 0.08:
+            anomalies.append("SCHEMA")
+        if null_pct > 5 or rng.random() < 0.06:
+            anomalies.append("NULL")
+        if rng.random() < 0.05:
+            anomalies.append("DUPE")
+
+        previous_ods = last_ods_by_table.get(table_name, ods)
+        ods_change_pct = round(((ods - previous_ods) / previous_ods) * 100, 1) if previous_ods else 0
+        if ods_change_pct > 10:
+            anomalies.append("ODS_SPIKE")
+        if ods_change_pct < -10:
+            anomalies.append("ODS_DROP")
+
+        rec = {
+            "source_file_name": file_name,
+            "table_name": table_name,
+            "run_date": run_date,
+            "job_start_date": job_start_date,
+            "source_arrival_ts": arrival_dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "gcs_preprocessor_ts": preproc_dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "bq_load_ts": bq_load_dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "raw_complete_ts": raw_dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "hist_complete_ts": hist_dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "row_count": row_count,
+            "null_pct": null_pct,
+            "status": status,
+            "trigger_type": "schedule" if status == "ODS Ready" else "event",
+            "current_layer": "ODS" if status == "ODS Ready" else status,
+            "layer_counts": {
+                "source": row_count,
+                "gcs_raw": gcs_raw,
+                "gcs_prep": gcs_prep,
+                "bq_load": bq_load,
+                "raw": raw,
+                "hist": hist,
+                "ods": ods,
+            },
+            "ods_row_count": ods,
+            "ods_change_pct": ods_change_pct,
+            "ods_trend": "spike" if ods_change_pct > 10 else "drop" if ods_change_pct < -10 else "stable",
+            "latency_ms": int((run_dt - job_start_dt).total_seconds()),
+            "anomalies": anomalies,
+        }
+        
+        # Add calculated layer metrics
+        rec["layer_metrics"] = calculate_layer_metrics(rec)
+        records.append(rec)
+        last_ods_by_table[table_name] = ods
+        base_rows += int((rng.random() - 0.5) * 800)
+
+    records.reverse()
+    return records
 
 
 def detect_anomalies(runs: List[dict]) -> List[dict]:
@@ -151,11 +295,13 @@ def detect_anomalies(runs: List[dict]) -> List[dict]:
 # Pre-compute at startup
 RUNS   = generate_pipeline_runs(14)
 ALERTS = detect_anomalies(RUNS)
+AUDIT_RECORDS = generate_audit_records(100)
+FILES  = AUDIT_RECORDS
 
 
 # ═══════════════════════════════════════════════════════════════
 #  REST ENDPOINTS
-# ═══════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════
 
 @app.get("/api/health")
 def health():
@@ -165,6 +311,129 @@ def health():
 @app.get("/api/runs")
 def get_runs(limit: int = 56):
     return {"runs": RUNS[:limit], "total": len(RUNS)}
+
+
+@app.get("/api/files")
+def get_files(limit: int = 100):
+    return {"files": FILES[:limit], "total": len(FILES)}
+
+
+@app.get("/api/files/detail")
+def get_files_detail(limit: int = 50):
+    """Return per-file layer-by-layer tracking with data quality metrics."""
+    detailed = []
+    for f in FILES[:limit]:
+        layers = f.get("layer_metrics", {}).get("layers", [])
+        detailed.append({
+            "source_file_name": f["source_file_name"],
+            "table_name": f["table_name"],
+            "run_date": f["run_date"],
+            "job_start_date": f["job_start_date"],
+            "status": f["status"],
+            "layers": layers,
+            "anomalies": f.get("anomalies", []),
+            "has_quality_issues": len(f.get("anomalies", [])) > 0 or any(m["status"] != "OK" for m in layers),
+        })
+    return {"files": detailed, "total": len(FILES)}
+
+
+@app.get("/api/audit")
+def get_audit(limit: int = 100):
+    return {"audit": AUDIT_RECORDS[:limit], "total": len(AUDIT_RECORDS)}
+
+
+@app.get("/api/tables")
+def get_tables():
+    tables = {}
+    for f in FILES:
+        tbl = f["table_name"]
+        stats = tables.setdefault(tbl, {
+            "name": tbl,
+            "file_count": 0,
+            "latest_status": "",
+            "alerts": 0,
+            "ods_ready": 0,
+            "last_run": "",
+        })
+        stats["file_count"] += 1
+        stats["alerts"] += len(f.get("anomalies", []))
+        if f["status"] == "ODS Ready":
+            stats["ods_ready"] += 1
+        if not stats["latest_status"] or f["run_date"] >= stats["last_run"]:
+            stats["latest_status"] = f["status"]
+            stats["last_run"] = f["run_date"]
+    return {"tables": sorted(tables.values(), key=lambda x: (-x["file_count"], x["name"]))}
+
+
+@app.get("/api/tables/{table_name}")
+def get_table_detail(table_name: str):
+    selected = [f for f in FILES if f["table_name"] == table_name]
+    if not selected:
+        raise HTTPException(status_code=404, detail=f"Table '{table_name}' not found")
+
+    selected = sorted(selected, key=lambda f: (f["run_date"], f["job_start_date"]))
+    anomalies = sum(len(f.get("anomalies", [])) for f in selected)
+    ods_ready = sum(1 for f in selected if f["status"] == "ODS Ready")
+    files_in_progress = len(selected) - ods_ready
+    latest = selected[-1]
+    return {
+        "table_name": table_name,
+        "total_files": len(selected),
+        "alerts": anomalies,
+        "ods_ready": ods_ready,
+        "in_progress": files_in_progress,
+        "latest_file": {
+            "source_file_name": latest["source_file_name"],
+            "status": latest["status"],
+            "run_date": latest["run_date"],
+            "job_start_date": latest["job_start_date"],
+            "row_count": latest["row_count"],
+            "latency_ms": latest["latency_ms"],
+            "anomalies": latest.get("anomalies", []),
+            "layer_metrics": latest.get("layer_metrics", {}),
+        },
+        "files": selected,
+    }
+
+
+def parse_dbt_log_file(path: Path) -> dict:
+    details = {"INFO": 0, "WARNING": 0, "ERROR": 0, "total": 0}
+    summary = {"levels": details, "messages": []}
+    if not path.exists():
+        return {"message": "dbt log file not found", "levels": summary["levels"], "recent": [], "parse_error": False}
+
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            level = None
+            if "ERROR" in line:
+                level = "ERROR"
+            elif "WARNING" in line:
+                level = "WARNING"
+            elif "INFO" in line:
+                level = "INFO"
+            else:
+                continue
+
+            summary["levels"][level] += 1
+            summary["levels"]["total"] += 1
+            if len(summary["messages"]) < 12:
+                ts = line.split(" ")[0].strip("[]")
+                summary["messages"].append({"level": level, "text": line, "timestamp": ts})
+
+    return {
+        "message": "dbt log analysis loaded",
+        "levels": summary["levels"],
+        "recent": summary["messages"],
+        "parse_error": False,
+    }
+
+
+@app.get("/api/dbt/logs/summary")
+def get_dbt_log_summary():
+    return parse_dbt_log_file(DBT_LOG_PATH)
 
 
 @app.get("/api/alerts")
@@ -186,6 +455,13 @@ def get_summary():
     avg_null    = round(sum(r["null_pct"] for r in last8) / len(last8), 2)
     avg_dup     = round(sum(r["dup_pct"]  for r in last8) / len(last8), 2)
     ods_yield   = round(last["counts"]["ods"] / last["counts"]["source"] * 100, 1)
+    files_processed = sum(1 for f in FILES if f["status"] == "ODS Ready")
+    files_in_progress = sum(1 for f in FILES if f["status"] != "ODS Ready")
+    files_with_alerts = sum(1 for f in FILES if f["anomalies"])
+    ods_schedule_spikes = sum(1 for f in FILES if f.get("trigger_type") == "schedule" and f.get("ods_change_pct", 0) > 10)
+    ods_schedule_drops = sum(1 for f in FILES if f.get("trigger_type") == "schedule" and f.get("ods_change_pct", 0) < -10)
+    ods_null_events = sum(1 for f in FILES if f.get("trigger_type") == "schedule" and "NULL" in f.get("anomalies", []))
+    event_files = sum(1 for f in FILES if f.get("trigger_type") == "event")
 
     return {
         "total_alerts":    len(ALERTS),
@@ -196,6 +472,13 @@ def get_summary():
         "avg_null_pct":    avg_null,
         "avg_dup_pct":     avg_dup,
         "ods_yield_pct":   ods_yield,
+        "files_processed": files_processed,
+        "files_in_progress": files_in_progress,
+        "files_with_alerts": files_with_alerts,
+        "ods_schedule_spikes": ods_schedule_spikes,
+        "ods_schedule_drops": ods_schedule_drops,
+        "ods_null_events": ods_null_events,
+        "event_files": event_files,
         "last_run_ts":     last["ts"],
         "layers":          LAYERS,
         "latest_counts":   last["counts"],
