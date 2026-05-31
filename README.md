@@ -1,4 +1,4 @@
-# ⚡ DataPulse — AI Pipeline Monitor
+# ⚡ DataPulse
 
 A production-ready, AI-powered monitoring dashboard for your data pipeline:
 
