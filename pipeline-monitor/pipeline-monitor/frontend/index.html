@@ -11,25 +11,26 @@
    DESIGN TOKENS & RESET
 ═══════════════════════════════════════════════════════════════ */
 :root {
-  --bg:        #050810;
-  --bg2:       #0a0f1e;
-  --bg3:       #0f1628;
-  --border:    rgba(99,179,237,0.10);
-  --border2:   rgba(99,179,237,0.22);
-  --accent:    #63b3ed;
-  --accent2:   #48bb78;
-  --warn:      #f6ad55;
-  --danger:    #fc8181;
-  --critical:  #ff4757;
-  --purple:    #b794f4;
-  --text:      #e2e8f0;
-  --muted:     #4a5568;
-  --muted2:    #718096;
+  --bg:        #000000;
+  --bg2:       #111111;
+  --bg3:       #141414;
+  --border:    rgba(26,28,31,0.55);
+  --border2:   rgba(38,40,45,0.55);
+  --accent:    #027a35;
+  --accent2:   #1e7f3e;
+  --warn:      #9ca3af;
+  --danger:    #ef4444;
+  --critical:  #dc2626;
+  --purple:    #86efac;
+  --text:      #f7f7f7;
+  --muted:     #c3c9cc;
+  --muted2:    #8f9699;
   --mono:      'Space Mono', 'Courier New', monospace;
   --sans:      'Syne', 'Segoe UI', sans-serif;
-  --radius:    10px;
-  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+  --radius:    12px;
+  --shadow:    0 10px 40px rgba(0,0,0,0.4);
 }
+body { background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 35%, #a5d6a7 100%); }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; font-size: 14px; }
 body {
@@ -46,14 +47,14 @@ body::before {
   content: '';
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image:
-    linear-gradient(rgba(99,179,237,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99,179,237,0.025) 1px, transparent 1px);
+    linear-gradient(rgba(27,94,32,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27,94,32,0.06) 1px, transparent 1px);
   background-size: 44px 44px;
 }
 body::after {
   content: '';
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(99,179,237,0.07), transparent);
+  background: radial-gradient(ellipse 70% 40% at 50% -10%, rgba(27,94,32,0.12), transparent);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -78,16 +79,16 @@ body::after {
 .logo { display: flex; align-items: center; gap: 12px; }
 .logo-icon {
   width: 34px; height: 34px;
-  background: linear-gradient(135deg, #63b3ed, #4299e1);
+  background: linear-gradient(135deg, #22c55e, #0f766e);
   border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
   font-size: 18px;
-  box-shadow: 0 0 22px rgba(99,179,237,0.35);
+  box-shadow: 0 0 22px rgba(34,197,94,0.35);
   animation: logoGlow 3s ease-in-out infinite;
 }
 @keyframes logoGlow {
-  0%,100% { box-shadow: 0 0 22px rgba(99,179,237,0.35); }
-  50%      { box-shadow: 0 0 38px rgba(99,179,237,0.65); }
+  0%,100% { box-shadow: 0 0 22px rgba(34,197,94,0.35); }
+  50%      { box-shadow: 0 0 38px rgba(34,197,94,0.65); }
 }
 .logo-name  { font-size: 19px; font-weight: 800; letter-spacing: -0.5px; }
 .logo-name span { color: var(--accent); }
@@ -118,7 +119,7 @@ body::after {
 #refreshBtn {
   background: rgba(99,179,237,0.08); border: 1px solid var(--border2);
   color: var(--accent); padding: 6px 16px; border-radius: 7px;
-  font-family: var(--mono); font-size: 11px; cursor: pointer; letter-spacing: 1px;
+  font-family: var(--mono); font-size: 11px; cursor: pointer; letter-spacing: 1px; font-weight: 700;
   transition: all 0.2s;
 }
 #refreshBtn:hover { background: rgba(99,179,237,0.16); }
@@ -136,13 +137,13 @@ body::after {
 }
 .nav-tab {
   padding: 15px 20px;
-  font-family: var(--mono); font-size: 10px; letter-spacing: 1.2px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1.2px;
   color: var(--muted2); cursor: pointer; border: none; background: none;
-  border-bottom: 2px solid transparent; transition: all 0.2s;
-  white-space: nowrap; flex-shrink: 0;
+  border-bottom: 3px solid transparent; transition: all 0.2s;
+  white-space: nowrap; flex-shrink: 0; font-weight: 800;
 }
 .nav-tab:hover  { color: var(--text); }
-.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
 .tab-badge {
   display: inline-flex; align-items: center; justify-content: center;
   width: 17px; height: 17px; border-radius: 50%;
@@ -154,6 +155,12 @@ body::after {
    MAIN / TAB PANELS
 ═══════════════════════════════════════════════════════════════ */
 #main { padding: 24px 28px; position: relative; z-index: 1; min-height: calc(100vh - 120px); }
+.table-picker { width: 100%; max-width: 320px; padding: 10px 13px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(148, 163, 184, 0.22); color: var(--text); font-family: var(--mono); font-size: 12px; font-weight: 700; }
+.table-picker option { background: rgba(15, 23, 42, 0.98); color: var(--text); }
+.selector-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.log-summary-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.log-message { font-family: var(--mono); font-size: 11px; color: #cbd5e0; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+.log-message span { display: block; margin-bottom: 4px; font-weight: 700; }
 .tab-panel { display: none; }
 .tab-panel.active { display: block; animation: fadeUp 0.3s ease; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
@@ -212,6 +219,18 @@ body::after {
   cursor: default;
 }
 .metric-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+.overview-banner {
+  display: flex; flex-direction: column; gap: 10px;
+  border: 1px solid rgba(99, 179, 237, 0.18);
+  background: rgba(56, 76, 118, 0.14);
+  border-radius: var(--radius); padding: 20px;
+}
+.overview-banner.good { border-color: rgba(72, 187, 120, 0.28); background: rgba(72, 187, 120, 0.08); }
+.overview-banner.warn { border-color: rgba(246, 173, 85, 0.28); background: rgba(246, 173, 85, 0.08); }
+.overview-banner.bad { border-color: rgba(255, 71, 87, 0.28); background: rgba(255, 71, 87, 0.08); }
+.overview-headline { font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; color: var(--text); }
+.overview-details { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: 12px; }
+.overview-details span { display: inline-flex; align-items: center; gap: 8px; }
 .metric-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
 }
@@ -324,30 +343,43 @@ body::after {
 /* ═══════════════════════════════════════════════════════════════
    CHECKS GRID
 ═══════════════════════════════════════════════════════════════ */
-.checks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+.checks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
 .check-card {
-  background: rgba(10,15,30,0.88);
+  background: rgba(6,10,12,0.92);
   border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 18px;
-  transition: border-color 0.2s, transform 0.2s;
+  border-radius: var(--radius); padding: 14px;
+  box-shadow: inset 0 0 0 1px rgba(2,122,53,0.04);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
+.check-card.ok { border-color: rgba(2,122,53,0.45); box-shadow: inset 4px 0 0 0 rgba(2,122,53,0.55); }
+.check-card.warn { border-color: rgba(156,163,175,0.45); box-shadow: inset 4px 0 0 0 rgba(156,163,175,0.45); }
+.check-card.bad { border-color: rgba(239,68,68,0.45); box-shadow: inset 4px 0 0 0 rgba(239,68,68,0.55); }
 .check-card:hover { border-color: var(--border2); transform: translateY(-1px); }
-.cc-top  { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.cc-icon { font-size: 22px; }
-.cc-name { font-size: 13px; font-weight: 700; }
-.cc-desc { font-size: 10px; color: var(--muted2); margin-top: 1px; font-family: var(--mono); }
-.cc-metric { font-family: var(--mono); font-size: 24px; font-weight: 700; margin: 8px 0; }
-.cm-ok   { color: var(--accent2); }
-.cm-warn { color: var(--warn); }
-.cm-bad  { color: var(--danger); }
-.cc-status {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-  padding: 5px 12px; border-radius: 5px;
+.cc-top  { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.cc-icon {
+  font-size: 18px; line-height: 1; width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
 }
-.cs-PASS { background: rgba(72,187,120,0.12);  color: var(--accent2); }
-.cs-WARN { background: rgba(246,173,85,0.12);  color: var(--warn); }
-.cs-FAIL { background: rgba(252,129,129,0.12); color: var(--danger); }
+.cc-icon.ok { background: rgba(2,122,53,0.18); color: #027a35; }
+.cc-icon.warn { background: rgba(156,163,175,0.18); color: #9ca3af; }
+.cc-icon.bad { background: rgba(239,68,68,0.18); color: #ef4444; }
+.cc-name { font-size: 13px; font-weight: 700; }
+.cc-desc { font-size: 10px; color: var(--muted2); margin-top: 2px; font-family: var(--mono); }
+.cc-metric { font-family: var(--mono); font-size: 20px; font-weight: 700; margin: 6px 0; }
+.cm-ok   { color: #027a35; }
+.cm-warn { color: #9ca3af; }
+.cm-bad  { color: #ef4444; }
+.cc-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 5px 12px; border-radius: 999px;
+}
+.cs-PASS { background: rgba(2,122,53,0.16);  color: #027a35; }
+.cs-WARN { background: rgba(156,163,175,0.16);  color: #9ca3af; }
+.cs-FAIL { background: rgba(239,68,68,0.16); color: #ef4444; }
 .cc-detail { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 8px; }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -383,13 +415,21 @@ body::after {
 .recon-table td   { padding: 10px 14px; border-bottom: 1px solid var(--border); color: #a0aec0; }
 .recon-table tr:hover td { background: rgba(99,179,237,0.03); }
 .recon-table .mono-cell { font-family: var(--mono); }
-.loss-ok   { color: var(--accent2); font-family: var(--mono); font-weight: 700; }
-.loss-warn { color: var(--warn);    font-family: var(--mono); font-weight: 700; }
-.loss-bad  { color: var(--danger);  font-family: var(--mono); font-weight: 700; }
-.pill { display: inline-block; padding: 2px 9px; border-radius: 10px; font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 1px; }
-.pill-OK   { background: rgba(72,187,120,0.12); color: var(--accent2); }
-.pill-WARN { background: rgba(246,173,85,0.12); color: var(--warn); }
-.pill-FAIL { background: rgba(252,129,129,0.12); color: var(--danger); }
+.files-table { width: 100%; }
+.table-scroll { overflow-x: auto; }
+.file-status-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 65px; }
+.file-card { background: rgba(0,0,0,0.88); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+  .file-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .file-title { font-weight: 800; color: var(--accent); font-size: 1rem; line-height: 1.2; }
+  .file-meta { font-family: var(--mono); font-size: 10px; color: var(--muted2); margin-top: 4px; }
+  .file-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  .file-stat { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+  .file-stat span:first-child { color: var(--muted2); font-size: 10px; }
+  .file-stat strong { color: var(--text); font-size: 0.92rem; }
+  .file-alerts { font-family: var(--mono); font-size: 10px; color: var(--muted2); margin-top: 10px; }
+.pill-OK   { background: rgba(2,122,53,0.16); color: #027a35; }
+.pill-WARN { background: rgba(156,163,175,0.16); color: #9ca3af; }
+.pill-FAIL { background: rgba(239,68,68,0.16); color: #ef4444; }
 
 /* ═══════════════════════════════════════════════════════════════
    AI AGENT
@@ -413,7 +453,7 @@ body::after {
 .qbtn {
   background: rgba(99,179,237,0.07); border: 1px solid rgba(99,179,237,0.18);
   color: var(--accent); font-size: 10px; padding: 4px 10px; border-radius: 18px;
-  cursor: pointer; font-family: var(--mono); letter-spacing: 0.5px; transition: all 0.2s;
+  cursor: pointer; font-family: var(--mono); letter-spacing: 0.5px; font-weight: 700; transition: all 0.2s;
 }
 .qbtn:hover { background: rgba(99,179,237,0.16); border-color: rgba(99,179,237,0.4); }
 .chat-input-row { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: rgba(5,8,16,0.4); flex-shrink: 0; }
@@ -460,7 +500,7 @@ body::after {
 .filter-btn {
   background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
   color: var(--muted2); font-size: 10px; padding: 4px 12px; border-radius: 18px;
-  cursor: pointer; font-family: var(--mono); letter-spacing: 0.5px; transition: all 0.2s;
+  cursor: pointer; font-family: var(--mono); letter-spacing: 0.5px; font-weight: 700; transition: all 0.2s;
 }
 .filter-btn:hover  { background: rgba(99,179,237,0.08); color: var(--text); }
 .filter-btn.active { background: rgba(99,179,237,0.12); border-color: rgba(99,179,237,0.4); color: var(--accent); }
@@ -500,6 +540,8 @@ body::after {
   <button class="nav-tab active" data-tab="overview">OVERVIEW</button>
   <button class="nav-tab" data-tab="alerts">ALERTS <span class="tab-badge" id="alertBadge">—</span></button>
   <button class="nav-tab" data-tab="checks">DATA QUALITY</button>
+  <button class="nav-tab" data-tab="files">FILE MONITORING</button>
+  <button class="nav-tab" data-tab="logs">LOG ANALYSIS</button>
   <button class="nav-tab" data-tab="layers">LAYER HEALTH</button>
   <button class="nav-tab" data-tab="reconciliation">RECONCILIATION</button>
   <button class="nav-tab" data-tab="agent">🤖 AI AGENT</button>
@@ -511,9 +553,23 @@ body::after {
   <!-- ─── OVERVIEW ─────────────────────────────────────────── -->
   <div id="tab-overview" class="tab-panel active">
     <div id="metricsGrid" class="metrics-grid mb20"></div>
+    <div class="card mb16" id="overviewBanner"></div>
     <div class="card mb16">
-      <div class="card-title">📡 Pipeline Topology — Latest Run</div>
+      <div class="card-title">🧩 Select Source Table Flow</div>
+      <div class="selector-row">
+        <select id="tableSelect" class="table-picker" onchange="renderSelectedTable()"></select>
+        <button class="filter-btn" onclick="renderSelectedTable()">VIEW FLOW</button>
+      </div>
+      <div id="tableDetailCard" style="margin-top:16px;"></div>
+    </div>
+    <div class="card mb16">
+      <div class="card-title">📡 Pipeline Topology — Latest Run (Aggregate)</div>
       <div class="pipeline-flow" id="pipelineFlow"></div>
+    </div>
+    <div class="card mb16">
+      <div class="card-title">📊 Per-Table Layer Monitoring</div>
+      <div class="metric-sub" style="margin:8px 0 12px;">Track layer-level counts and yield from source through ODS for each table.</div>
+      <div class="table-scroll"><table class="recon-table" id="tableProgressionTable"><thead><tr><th>Table</th><th>Source</th><th>GCS Raw</th><th>GCS Prep</th><th>BQ Load</th><th>Raw</th><th>Hist</th><th>ODS</th><th>Yield</th></tr></thead><tbody id="tableProgressionBody"></tbody></table></div>
     </div>
     <div class="g2 mb16">
       <div class="card"><div class="card-title">📊 Source Record Volume (Last 20 Runs)</div><div class="chart-box"><canvas id="cVolume"></canvas></div></div>
@@ -545,8 +601,26 @@ body::after {
 
   <!-- ─── DATA QUALITY CHECKS ──────────────────────────────── -->
   <div id="tab-checks" class="tab-panel">
+    <div class="metric-sub" style="margin-bottom:14px;">Data quality checks show table-level and pipeline-level health for critical checks.</div>
     <div class="checks-grid" id="checksGrid"></div>
-    <div class="card"><div class="card-title">📉 Quality Metrics Trend (Last 20 Runs)</div><div class="chart-box tall"><canvas id="cQuality"></canvas></div></div>
+    <div class="card"><div class="card-title">📉 Quality Metrics Trend (Last 20 Runs)</div><div class="metric-sub" style="margin:8px 0 12px;">Trend of nulls, duplicates, and latency to help surface DQ deterioration.</div><div class="chart-box tall"><canvas id="cQuality"></canvas></div></div>
+  </div>
+
+  <!-- ─── FILE MONITORING ─────────────────────────────────── -->
+  <div id="tab-files" class="tab-panel">
+    <div class="g2 mb16">
+      <div class="card"><div class="card-title">📁 File Status Summary</div><div id="fileSummaryGrid" class="metrics-grid"></div></div>
+    </div>
+    <div id="filesDetailContainer"></div>
+  </div>
+
+  <!-- ─── LOG ANALYSIS ─────────────────────────────────────── -->
+  <div id="tab-logs" class="tab-panel">
+    <div class="g2 mb16">
+      <div class="card"><div class="card-title">📜 dbt Log Summary</div><div id="logsSummaryGrid" class="metrics-grid"></div></div>
+      <div class="card"><div class="card-title">🔎 Recent dbt Log Events</div><div class="table-scroll"><table class="recon-table"><thead><tr><th>Time</th><th>Level</th><th>Message</th></tr></thead><tbody id="logsTableBody"></tbody></table></div></div>
+    </div>
+    <div class="card"><div class="card-title">🧠 Log Analysis</div><div id="logsAnalysisText" class="metric-sub">Log analysis will appear when dbt logs are loaded.</div></div>
   </div>
 
   <!-- ─── LAYER HEALTH ─────────────────────────────────────── -->
@@ -607,7 +681,7 @@ const API = window.location.hostname === 'localhost' || window.location.hostname
 /* ═══════════════════════════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════════════════════════ */
-let STATE = { runs:[], alerts:[], summary:{}, recon:[], checks:[], filter:'all' };
+let STATE = { runs:[], alerts:[], files:[], tables:[], summary:{}, recon:[], checks:[], logs:{}, filter:'all' };
 let CHARTS = {};
 let chatHistory = [];
 const tabBuilt = {};
@@ -623,14 +697,21 @@ async function apiFetch(path) {
 
 async function loadAll() {
   try {
-    const [runsRes, alertsRes, summaryRes] = await Promise.all([
+    const [runsRes, alertsRes, summaryRes, filesRes, filesDetailRes, tablesRes, logsRes] = await Promise.all([
       apiFetch('/api/runs?limit=56'),
       apiFetch('/api/alerts?limit=30'),
       apiFetch('/api/metrics/summary'),
+      apiFetch('/api/files?limit=100'),
+      apiFetch('/api/files/detail?limit=50'),
+      apiFetch('/api/tables'),
+      apiFetch('/api/dbt/logs/summary'),
     ]);
     STATE.runs    = runsRes.runs;
     STATE.alerts  = alertsRes.alerts;
     STATE.summary = summaryRes;
+    STATE.files   = filesDetailRes.files;  // Use detailed files with layer metrics
+    STATE.tables  = tablesRes.tables;
+    STATE.logs    = logsRes;
     setApiStatus('ok','● API CONNECTED');
     return true;
   } catch(e) {
@@ -710,12 +791,11 @@ function buildOverview() {
 
   // Metric cards
   const metrics = [
-    {label:'TOTAL ALERTS',   value:s.total_alerts,   cls:s.total_alerts>10?'mc-danger':'mc-warn',   vcls:s.total_alerts>10?'mv-danger':'mv-warn',   sub:'last 14 days'},
-    {label:'CRITICAL',       value:s.critical_alerts, cls:s.critical_alerts>0?'mc-critical':'mc-ok', vcls:s.critical_alerts>0?'mv-critical':'mv-ok',  sub:'spikes & drops'},
-    {label:'AVG LATENCY',    value:s.avg_latency_ms+'ms', cls:s.avg_latency_ms>3000?'mc-danger':'mc-ok', vcls:s.avg_latency_ms>3000?'mv-danger':'mv-ok', sub:'last 8 runs'},
-    {label:'AVG NULL %',     value:s.avg_null_pct+'%', cls:s.avg_null_pct>5?'mc-danger':s.avg_null_pct>2?'mc-warn':'mc-ok', vcls:s.avg_null_pct>5?'mv-danger':s.avg_null_pct>2?'mv-warn':'mv-ok', sub:'data quality'},
-    {label:'AVG DUPLICATE %',value:s.avg_dup_pct+'%', cls:s.avg_dup_pct>3?'mc-danger':s.avg_dup_pct>1?'mc-warn':'mc-ok',  vcls:s.avg_dup_pct>3?'mv-danger':s.avg_dup_pct>1?'mv-warn':'mv-ok',  sub:'dedup rate'},
-    {label:'ODS YIELD',      value:s.ods_yield_pct+'%', cls:s.ods_yield_pct>95?'mc-ok':s.ods_yield_pct>88?'mc-warn':'mc-danger', vcls:s.ods_yield_pct>95?'mv-ok':s.ods_yield_pct>88?'mv-warn':'mv-danger', sub:'src→ods ratio'},
+    {label:'TOTAL ALERTS',   value:s.total_alerts,      cls:s.total_alerts>10?'mc-danger':'mc-warn',    vcls:s.total_alerts>10?'mv-danger':'mv-warn',   sub:'last 14 days'},
+    {label:'CRITICAL',       value:s.critical_alerts,    cls:s.critical_alerts>0?'mc-critical':'mc-ok',  vcls:s.critical_alerts>0?'mv-critical':'mv-ok',  sub:'critical issues'},
+    {label:'DQ ISSUES',      value:s.files_with_alerts,  cls:s.files_with_alerts>20?'mc-danger':'mc-ok', vcls:s.files_with_alerts>20?'mv-danger':'mv-ok', sub:'quality issues today'},
+    {label:'LAYER HEALTH',   value:s.layers.length,      cls:s.layers.length>=3?'mc-ok':'mc-warn',      vcls:s.layers.length>=3?'mv-ok':'mv-warn',      sub:'layers monitored'},
+    {label:'RECONCILIATION', value:typeof s.recon_gaps !== 'undefined' ? s.recon_gaps : 0, cls:(typeof s.recon_gaps !== 'undefined' ? s.recon_gaps : 0)>0?'mc-danger':'mc-ok', vcls:(typeof s.recon_gaps !== 'undefined' ? s.recon_gaps : 0)>0?'mv-danger':'mv-ok', sub:'reconciliation gaps'},
   ];
   document.getElementById('metricsGrid').innerHTML = metrics.map(m=>`
     <div class="metric-card ${m.cls}">
@@ -725,10 +805,33 @@ function buildOverview() {
     </div>`).join('');
   document.getElementById('alertBadge').textContent = s.total_alerts;
 
-  // Pipeline flow
-  const layers = ['Source','GCS Raw','GCS Preprocessor','BQ Load','Raw Layer','Hist Layer','ODS Layer'];
-  const lkeys  = ['source','gcs_raw','gcs_prep','bq_load','raw','hist','ods'];
-  const lshort = ['SRC','GCS-RAW','GCS-PREP','BQ-LOAD','RAW','HIST','ODS'];
+  const statusText = s.critical_alerts > 0
+    ? `${s.critical_alerts} critical alert(s) need review`
+    : s.high_alerts > 0
+      ? `${s.high_alerts} high-severity issue(s) detected`
+      : s.recon_gaps > 0
+        ? `${s.recon_gaps} reconciliation gap(s) identified`
+        : 'Pipeline stable — no critical issues detected';
+  const statusClass = s.critical_alerts > 0 ? 'bad' : s.high_alerts > 0 || s.recon_gaps > 0 ? 'warn' : 'good';
+  const lastSync = new Date().toLocaleString();
+  document.getElementById('overviewBanner').innerHTML = `
+    <div class="overview-banner ${statusClass}">
+      <div class="overview-headline">${statusText}</div>
+      <div class="overview-details">
+        <span>Latest run date: <strong>${s.latest_run_date || '—'}</strong></span>
+        <span>Last sync: <strong>${lastSync}</strong></span>
+        <span>Avg latency: <strong>${fmt(s.avg_latency_ms)} ms</strong></span>
+        <span>Null rate: <strong>${s.avg_null_pct}%</strong></span>
+        <span>Dup rate: <strong>${s.avg_dup_pct}%</strong></span>
+        <span>Files received: <strong>${typeof s.received_files_today !== 'undefined' ? s.received_files_today : '—'}</strong></span>
+        <span>Files pending: <strong>${typeof s.pending_files_today !== 'undefined' ? s.pending_files_today : '—'}</strong></span>
+      </div>
+    </div>`;
+
+  // Pipeline flow (aggregate)
+  const layers = ['BQ Load','Raw Layer','Hist Layer'];
+  const lkeys  = ['bq_load','raw','hist'];
+  const lshort = ['BQ-LOAD','RAW','HIST'];
   const lc     = s.latest_counts || {};
   const hasAlert = (layer) => STATE.alerts.slice(0,8).some(a=>a.layer===layer);
 
@@ -746,8 +849,53 @@ function buildOverview() {
     </div>${arrow}`;
   }).join('');
 
+  // Per-table layer progression
+  const tableMap = {};
+  if(STATE.files && Array.isArray(STATE.files)) {
+    STATE.files.forEach(file => {
+      const tbl = file.table_name;
+      if(!tableMap[tbl]) {
+        tableMap[tbl] = {
+           gcs_raw: 0, gcs_prep: 0, bq_load: 0, raw: 0, hist: 0, ods: 0,
+          count: 0
+        };
+      }
+      if(file.layers && Array.isArray(file.layers)) {
+        file.layers.forEach(layer => {
+          if(tableMap[tbl][layer.layer] !== undefined) {
+            tableMap[tbl][layer.layer] = Math.max(tableMap[tbl][layer.layer], layer.count);
+          }
+        });
+      }
+      tableMap[tbl].count++;
+    });
+  }
+
+  document.getElementById('tableProgressionBody').innerHTML = Object.entries(tableMap).slice(0,20).map(([tbl, data]) => {
+    const src = data.source || 0;
+    const ods = data.ods || 0;
+    const yieldPct = src > 0 ? ((ods / src) * 100).toFixed(1) : 0;
+    const yieldCls = yieldPct > 95 ? 'loss-ok' : yieldPct > 88 ? 'loss-warn' : 'loss-fail';
+    return `
+      <tr>
+        <td><strong>${tbl}</strong></td>
+        <td class="mono-cell">${fmt(data.source)}</td>
+        <td class="mono-cell">${fmt(data.gcs_raw)} ${data.source>0?`<div class="micro-loss">${((data.source-data.gcs_raw)/data.source*100).toFixed(1)}%</div>`:''}</td>
+        <td class="mono-cell">${fmt(data.gcs_prep)} ${data.gcs_raw>0?`<div class="micro-loss">${((data.gcs_raw-data.gcs_prep)/data.gcs_raw*100).toFixed(1)}%</div>`:''}</td>
+        <td class="mono-cell">${fmt(data.bq_load)} ${data.gcs_prep>0?`<div class="micro-loss">${((data.gcs_prep-data.bq_load)/data.gcs_prep*100).toFixed(1)}%</div>`:''}</td>
+        <td class="mono-cell">${fmt(data.raw)} ${data.bq_load>0?`<div class="micro-loss">${((data.bq_load-data.raw)/data.bq_load*100).toFixed(1)}%</div>`:''}</td>
+        <td class="mono-cell">${fmt(data.hist)} ${data.raw>0?`<div class="micro-loss">${((data.raw-data.hist)/data.raw*100).toFixed(1)}%</div>`:''}</td>
+        <td class="mono-cell">${fmt(data.ods)} ${data.hist>0?`<div class="micro-loss">${((data.hist-data.ods)/data.hist*100).toFixed(1)}%</div>`:''}</td>
+        <td class="mono-cell ${yieldCls}"><strong>${yieldPct}%</strong></td>
+      </tr>`;
+  }).join('');
+
   // Recent alerts
   document.getElementById('recentAlerts').innerHTML = STATE.alerts.slice(0,8).map(alertRowHTML).join('');
+
+  // Table selector and details
+  populateTableSelector();
+  renderSelectedTable();
 
   // Charts
   const recent20 = STATE.runs.slice(0,20).reverse();
@@ -779,9 +927,67 @@ function buildOverview() {
   ]},options:{...CD}});
 }
 
+function populateTableSelector() {
+  const el = document.getElementById('tableSelect');
+  if(!el || !STATE.tables) return;
+  const selected = el.value || STATE.tables[0]?.name || '';
+  el.innerHTML = STATE.tables.map(tbl => `
+    <option value="${tbl.name}">${tbl.name} (${tbl.file_count})</option>
+  `).join('');
+  if(selected) el.value = selected;
+}
+
+function renderSelectedTable() {
+  const el = document.getElementById('tableSelect');
+  if(!el) return;
+  const name = el.value || STATE.tables[0]?.name || '';
+  if(!name) {
+    document.getElementById('tableDetailCard').innerHTML = '<div class="metric-sub">No table data available.</div>';
+    return;
+  }
+  const detail = STATE.tables.find(t => t.name === name) || {};
+  const files = STATE.files.filter(f => f.table_name === name);
+  const latest = files[files.length - 1] || {};
+  const alerts = latest.anomalies?.length || 0;
+  const sourceCount = latest.layer_metrics?.layers?.find(l=>l.layer==='source')?.count || latest.row_count || 0;
+  const histCount = latest.layer_metrics?.layers?.find(l=>l.layer==='hist')?.count || 0;
+  const rawCount = latest.layer_metrics?.layers?.find(l=>l.layer==='raw')?.count || latest.row_count || 0;
+  const histYieldPct = sourceCount ? ((histCount / sourceCount) * 100).toFixed(1) : '—';
+  const histImpact = sourceCount ? `${(sourceCount - histCount).toLocaleString()} rows (${sourceCount ? ((sourceCount - histCount)/sourceCount*100).toFixed(1) : '0'}% drop)` : '—';
+
+  document.getElementById('tableDetailCard').innerHTML = `
+    <div class="g2" style="gap:14px;">
+      <div class="metric-card mc-info"><div class="metric-label">SOURCE TABLE</div><div class="metric-value mv-info">${name}</div><div class="metric-sub">Selected source flow</div></div>
+      <div class="metric-card mc-ok"><div class="metric-label">LATEST FILE</div><div class="metric-value mv-ok">${latest.source_file_name ? 1 : 0}</div><div class="metric-sub">selected file</div></div>
+      <div class="metric-card mc-danger"><div class="metric-label">ALERTS</div><div class="metric-value mv-danger">${alerts}</div><div class="metric-sub">detected issues</div></div>
+      <div class="metric-card mc-warn"><div class="metric-label">HIST YIELD</div><div class="metric-value mv-warn">${histYieldPct}%</div><div class="metric-sub">source → Hist</div></div>
+    </div>
+    <div class="g2" style="gap:14px;margin-top:14px;">
+      <div class="metric-card mc-info"><div class="metric-label">SOURCE COUNT</div><div class="metric-value mv-info">${sourceCount.toLocaleString()}</div><div class="metric-sub">latest arrival</div></div>
+      <div class="metric-card mc-ok"><div class="metric-label">HIST COUNT</div><div class="metric-value mv-ok">${histCount.toLocaleString()}</div><div class="metric-sub">latest Hist ingest</div></div>
+      <div class="metric-card mc-warn"><div class="metric-label">HIST IMPACT</div><div class="metric-value mv-warn">${histImpact}</div><div class="metric-sub">source loss effect</div></div>
+      <div class="metric-card mc-danger"><div class="metric-label">NULL RATE</div><div class="metric-value mv-danger">${typeof latest.null_pct === 'number' ? latest.null_pct + '%' : '—'}</div><div class="metric-sub">latest row quality</div></div>
+    </div>
+    <div class="card" style="margin-top:14px;"><div class="card-title">Latest Table Run</div>
+      <div class="table-scroll"><table class="recon-table"><tbody>
+        <tr><td>Source file</td><td>${latest.source_file_name||'—'}</td></tr>
+        <tr><td>Status</td><td>${latest.status||'—'}</td></tr>
+        <tr><td>Trigger type</td><td>${latest.trigger_type||'—'}</td></tr>
+        <tr><td>Source arrival</td><td>${latest.source_arrival_ts||'—'}</td></tr>
+        <tr><td>Hist complete</td><td>${latest.hist_complete_ts||'—'}</td></tr>
+        <tr><td>Null rate</td><td>${typeof latest.null_pct === 'number' ? latest.null_pct + '%' : '—'}</td></tr>
+        <tr><td>Duplicate rate</td><td>${typeof latest.dup_pct === 'number' ? latest.dup_pct + '%' : (typeof latest.dup_pct !== 'undefined' && latest.dup_pct !== null ? latest.dup_pct : '—')}</td></tr>
+        <tr><td>Latency</td><td>${latest.latency_ms?latest.latency_ms + ' ms':'—'}</td></tr>
+        <tr><td>Raw count</td><td>${rawCount?rawCount.toLocaleString():'—'}</td></tr>
+        <tr><td>Anomalies</td><td>${latest.anomalies?.length?latest.anomalies.join(', '):'None'}</td></tr>
+      </tbody></table></div>
+    </div>
+  `;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    ALERTS TAB
-═══════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════ */
 function buildAlerts() {
   const types = [...new Set(STATE.alerts.map(a=>a.type))];
 
@@ -818,9 +1024,10 @@ function filterAlerts(type, btn) {
 async function buildChecks() {
   const res = await apiFetch('/api/metrics/quality_checks');
   document.getElementById('checksGrid').innerHTML = res.checks.map(c=>{
+    const statusClass = c.status==='PASS'?'ok':c.status==='WARN'?'warn':'bad';
     const mc = c.status==='PASS'?'cm-ok':c.status==='WARN'?'cm-warn':'cm-bad';
-    return `<div class="check-card">
-      <div class="cc-top"><div class="cc-icon">${c.icon}</div>
+    return `<div class="check-card ${statusClass}">
+      <div class="cc-top"><div class="cc-icon ${statusClass}">${c.icon}</div>
         <div><div class="cc-name">${c.name}</div><div class="cc-desc">${c.desc}</div></div>
       </div>
       <div class="cc-metric ${mc}">${c.value} <span style="font-size:11px;color:var(--muted)">${c.unit}</span></div>
@@ -838,9 +1045,100 @@ async function buildChecks() {
   ]},options:{...CD}});
 }
 
+async function buildFiles() {
+  const res = await apiFetch('/api/files/detail?limit=50');
+  STATE.files = res.files;
+
+  const total = STATE.files.length;
+  const processed = STATE.files.filter(f => f.status === 'ODS Ready').length;
+  const inProgress = total - processed;
+  const alerts = STATE.files.filter(f => f.anomalies && f.anomalies.length).length;
+
+  document.getElementById('fileSummaryGrid').innerHTML = [
+    {label:'Files Monitored', value:total, sub:'latest events'},
+    {label:'ODS Ready', value:processed, sub:'finished files'},
+    {label:'In Progress', value:inProgress, sub:'still flowing'},
+    {label:'Files with Alerts', value:alerts, sub:'quality issues'},
+  ].map(item => `
+    <div class="metric-card mc-info">
+      <div class="metric-label">${item.label}</div>
+      <div class="metric-value mv-info">${item.value}</div>
+      <div class="metric-sub">${item.sub}</div>
+    </div>`).join('');
+
+  document.getElementById('filesDetailContainer').innerHTML = STATE.files.map(f => {
+    const statusClass = f.status === 'ODS Ready' ? 'pill-OK' : f.status === 'Hist' ? 'pill-WARN' : 'pill-FAIL';
+    const anomalies = f.anomalies.length ? f.anomalies.join(', ') : '✓ Clean';
+    const histCount = f.layers?.find(l => l.layer === 'hist')?.count || 0;
+    const rawCount = f.layers?.find(l => l.layer === 'raw')?.count || f.row_count || f.layers?.find(l => l.layer === 'source')?.count || 0;
+
+    return `
+      <div class="file-card">
+        <div class="file-header">
+          <div>
+            <div class="file-title">${f.table_name}</div>
+            <div class="file-meta">${f.source_file_name}</div>
+            <div class="file-meta">${f.run_date} • ${f.trigger_type || 'Trigger N/A'}</div>
+          </div>
+          <div>
+            <span class="pill ${statusClass}">${f.status}</span>
+          </div>
+        </div>
+        <div class="file-stats">
+          <div class="file-stat"><span>Raw count</span><strong>${rawCount?.toLocaleString()||'—'}</strong></div>
+          <div class="file-stat"><span>Null %</span><strong>${typeof f.null_pct==='number'?f.null_pct+'%':'—'}</strong></div>
+          <div class="file-stat"><span>Hist count</span><strong>${histCount.toLocaleString()||'—'}</strong></div>
+          <div class="file-stat"><span>Anomalies</span><strong>${f.anomalies.length || 0}</strong></div>
+          <div class="file-stat"><span>Status</span><strong>${f.status}</strong></div>
+          <div class="file-stat"><span>Updated</span><strong>${f.run_date}</strong></div>
+        </div>
+        <div class="file-alerts">Alerts: ${anomalies}</div>
+      </div>`;
+  }).join('');
+}
+
+function buildLogs() {
+  const levels = STATE.logs.levels || {};
+  const grid = document.getElementById('logsSummaryGrid');
+  const body = document.getElementById('logsTableBody');
+  const analysis = document.getElementById('logsAnalysisText');
+
+  if(grid) {
+    grid.innerHTML = [
+      {label:'Info', value:levels.INFO || 0, color:'#38bdf8'},
+      {label:'Warnings', value:levels.WARNING || 0, color:'#f6ad55'},
+      {label:'Errors', value:levels.ERROR || 0, color:'#ff6b81'},
+    ].map(item => `
+      <div class="metric-card" style="border-color:${item.color};background:rgba(255,255,255,0.04);">
+        <div class="metric-label">${item.label}</div>
+        <div class="metric-value" style="color:${item.color};">${item.value}</div>
+        <div class="metric-sub">dbt log count</div>
+      </div>
+    `).join('');
+  }
+
+  if(body) {
+    body.innerHTML = (STATE.logs.recent || []).map(msg => `
+      <tr>
+        <td>${msg.timestamp}</td>
+        <td>${msg.level}</td>
+        <td>${msg.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>
+      </tr>
+    `).join('');
+    if(!body.innerHTML) {
+      body.innerHTML = '<tr><td colspan="3" style="color:var(--muted);">No dbt log events found.</td></tr>';
+    }
+  }
+
+  if(analysis) {
+    const message = STATE.logs.message || 'Live dbt log analysis is available here when logs are loaded.';
+    analysis.textContent = message;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    LAYER HEALTH TAB
-═══════════════════════════════════════════════════════════════ */
+═══════════════════════════════════════════════════════ */
 function buildLayers() {
   const layers = ['Source','GCS Raw','GCS Preprocessor','BQ Load','Raw Layer','Hist Layer','ODS Layer'];
   const lkeys  = ['source','gcs_raw','gcs_prep','bq_load','raw','hist','ods'];
@@ -1025,7 +1323,7 @@ async function sendChat() {
 /* ═══════════════════════════════════════════════════════════════
    TAB ROUTING
 ═══════════════════════════════════════════════════════════════ */
-const TAB_BUILDERS = { alerts:buildAlerts, checks:buildChecks, layers:buildLayers, reconciliation:buildRecon, agent:buildAgent };
+const TAB_BUILDERS = { alerts:buildAlerts, checks:buildChecks, files:buildFiles, logs:buildLogs, layers:buildLayers, reconciliation:buildRecon, agent:buildAgent };
 
 function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
