@@ -324,12 +324,25 @@ def get_files_detail(limit: int = 50):
     detailed = []
     for f in FILES[:limit]:
         layers = f.get("layer_metrics", {}).get("layers", [])
+        # Ensure duplicate percentage is available per-file; fall back to run-level dup_pct when missing
+        dup_pct = f.get("dup_pct")
+        if dup_pct is None:
+            run_match = next((r for r in RUNS if r.get("date") == f.get("run_date")), None)
+            dup_pct = run_match.get("dup_pct") if run_match else None
         detailed.append({
             "source_file_name": f["source_file_name"],
             "table_name": f["table_name"],
             "run_date": f["run_date"],
             "job_start_date": f["job_start_date"],
+            "source_arrival_ts": f.get("source_arrival_ts"),
+            "hist_complete_ts": f.get("hist_complete_ts"),
+            "row_count": f.get("row_count"),
+            "null_pct": f.get("null_pct"),
+            "dup_pct": dup_pct,
+            "latency_ms": f.get("latency_ms"),
             "status": f["status"],
+            "trigger_type": f.get("trigger_type"),
+            "layer_metrics": f.get("layer_metrics"),
             "layers": layers,
             "anomalies": f.get("anomalies", []),
             "has_quality_issues": len(f.get("anomalies", [])) > 0 or any(m["status"] != "OK" for m in layers),
@@ -455,13 +468,20 @@ def get_summary():
     avg_null    = round(sum(r["null_pct"] for r in last8) / len(last8), 2)
     avg_dup     = round(sum(r["dup_pct"]  for r in last8) / len(last8), 2)
     ods_yield   = round(last["counts"]["ods"] / last["counts"]["source"] * 100, 1)
-    files_processed = sum(1 for f in FILES if f["status"] == "ODS Ready")
-    files_in_progress = sum(1 for f in FILES if f["status"] != "ODS Ready")
-    files_with_alerts = sum(1 for f in FILES if f["anomalies"])
-    ods_schedule_spikes = sum(1 for f in FILES if f.get("trigger_type") == "schedule" and f.get("ods_change_pct", 0) > 10)
-    ods_schedule_drops = sum(1 for f in FILES if f.get("trigger_type") == "schedule" and f.get("ods_change_pct", 0) < -10)
-    ods_null_events = sum(1 for f in FILES if f.get("trigger_type") == "schedule" and "NULL" in f.get("anomalies", []))
-    event_files = sum(1 for f in FILES if f.get("trigger_type") == "event")
+    latest_run_date = max(f["run_date"] for f in FILES)
+    latest_files = [f for f in FILES if f["run_date"] == latest_run_date]
+    expected_files_today = len(latest_files)
+    received_files_today = sum(1 for f in latest_files if f["status"] in ["Hist", "ODS Ready"])
+    pending_files_today = sum(1 for f in latest_files if f["status"] not in ["Hist", "ODS Ready"])
+    event_files = sum(1 for f in latest_files if f.get("trigger_type") == "event")
+    hist_ready = sum(1 for f in latest_files if f["status"] in ["Hist", "ODS Ready"])
+    ods_ready = sum(1 for f in latest_files if f["status"] == "ODS Ready")
+    awaiting_ods = sum(1 for f in latest_files if f["status"] == "Hist")
+    files_with_alerts = sum(1 for f in latest_files if f["anomalies"])
+    ods_schedule_spikes = sum(1 for f in latest_files if f.get("trigger_type") == "schedule" and f.get("ods_change_pct", 0) > 10)
+    ods_schedule_drops = sum(1 for f in latest_files if f.get("trigger_type") == "schedule" and f.get("ods_change_pct", 0) < -10)
+    ods_null_events = sum(1 for f in latest_files if f.get("trigger_type") == "schedule" and "NULL" in f.get("anomalies", []))
+    recon_gaps = sum(1 for a in ALERTS if a["type"] == "RECON")
 
     return {
         "total_alerts":    len(ALERTS),
@@ -472,13 +492,19 @@ def get_summary():
         "avg_null_pct":    avg_null,
         "avg_dup_pct":     avg_dup,
         "ods_yield_pct":   ods_yield,
-        "files_processed": files_processed,
-        "files_in_progress": files_in_progress,
+        "latest_run_date": latest_run_date,
+        "expected_files_today": expected_files_today,
+        "received_files_today": received_files_today,
+        "pending_files_today": pending_files_today,
+        "event_files": event_files,
+        "hist_ready": hist_ready,
+        "ods_ready": ods_ready,
+        "awaiting_ods": awaiting_ods,
         "files_with_alerts": files_with_alerts,
         "ods_schedule_spikes": ods_schedule_spikes,
         "ods_schedule_drops": ods_schedule_drops,
         "ods_null_events": ods_null_events,
-        "event_files": event_files,
+        "recon_gaps": recon_gaps,
         "last_run_ts":     last["ts"],
         "layers":          LAYERS,
         "latest_counts":   last["counts"],
